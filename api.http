@@ -1,0 +1,16 @@
+
+GET  http://localhost:5000/api/courses
+Content-Type: application/json
+
+
+###
+POST  http://localhost:5000/api/courses
+Content-Type: application/json
+
+{
+  "name": "Curso de NestJS",
+  "description": "Aprendendo Nest passo a passo",
+  "duration": 40,
+  "date_init": "2025-01-01"
+}
+

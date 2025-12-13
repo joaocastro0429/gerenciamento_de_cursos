@@ -1,15 +1,15 @@
+version: '3.8'
+
 services:
   postgres:
-    image: postgres:latest
-    container_name: postgres
+    container_name: gerenciamento_de_cursos_postgres
+    image: postgres
+    ports:
+      - 5433:5432
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: docker
-      POSTGRES_DB: gerenciamento_de_cursos
-    ports:
-      - "5433:5432"
+      POSTGRES_DB: nest-clean
+      PGDATA: /data/postgres
     volumes:
-      - postgres_data:/var/lib/postgresql
-
-volumes:
-  postgres_data:
+      - ./data/pg:/data/postgres
