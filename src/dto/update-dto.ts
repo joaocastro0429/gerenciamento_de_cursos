@@ -1,7 +1,7 @@
-import { IsDate, IsNumber, IsString } from "class-validator";
+import { IsDate, IsDateString, IsNumber, IsString, IsUUID } from "class-validator";
 
 export class UpdateDto {
-  @IsString()
+  @IsUUID()
   id: string;
 
   @IsString()
@@ -13,6 +13,6 @@ export class UpdateDto {
   @IsNumber()
   duration: number;
 
-  @IsDate()
+  @IsDateString()
   date_init: Date;
 }

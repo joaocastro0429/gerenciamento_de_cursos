@@ -1,8 +1,10 @@
-import { IsDate, IsNumber, IsString } from "class-validator";
+import { IsDate, IsNumber, IsOptional, IsString, IsUUID } from "class-validator";
+import { Type } from 'class-transformer';
 
 export class UserDto {
-  @IsString()
-  id: string;
+  @IsOptional()
+  @IsUUID()
+  id?: string;
 
   @IsString()
   name: string;
@@ -14,5 +16,6 @@ export class UserDto {
   duration: number;
 
   @IsDate()
+  @Type(() => Date)
   date_init: Date;
 }

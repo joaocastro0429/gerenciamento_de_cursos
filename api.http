@@ -1,16 +1,37 @@
-
-GET  http://localhost:5000/api/courses
-Content-Type: application/json
-
-
-###
-POST  http://localhost:5000/api/courses
+### Criar curso
+POST http://localhost:5555/api/cursos
 Content-Type: application/json
 
 {
-  "name": "Curso de NestJS",
-  "description": "Aprendendo Nest passo a passo",
+  "name": "NestJS Avançado",
+  "description": "Curso completo de NestJS com Prisma",
   "duration": 40,
-  "date_init": "2025-01-01"
+  "date_init": "2025-01-15"
 }
 
+### Listar todos os cursos
+GET http://localhost:5555/api/cursos
+
+### Filtrar por data de início
+GET http://localhost:5555/api/cursos?data_init=2025-01-15
+
+### Filtrar por duração
+GET http://localhost:5555/api/cursos?duration=40
+
+### Filtrar por data e duração
+GET http://localhost:5555/api/cursos?data_init=2025-01-15&duration=40
+
+### Buscar curso por ID
+GET http://localhost:5555/api/cursos/1
+
+### Atualizar curso
+PATCH http://localhost:5555/api/cursos/1
+Content-Type: application/json
+
+{
+  "name": "NestJS Expert",
+  "duration": 50
+}
+
+### Deletar curso
+DELETE http://localhost:5555/api/cursos/1

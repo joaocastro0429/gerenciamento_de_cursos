@@ -25,74 +25,126 @@
 
 [Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
 
-## Project setup
+# Gerenciamento de Cursos (NestJS + Prisma)
 
-```bash
-$ npm install
+API simples para gerenciar cursos usando NestJS e Prisma com PostgreSQL.
+
+--
+
+## Resumo
+
+Este repositório implementa CRUD de cursos com validação DTO (`class-validator`), conversão de tipos (`class-transformer`) e persistência via Prisma.
+
+## Pré-requisitos
+
+- Node.js 18+ e npm
+- Docker & Docker Compose (opcional, recomendado para Postgres)
+
+## Variáveis de ambiente
+
+Crie um arquivo `.env` na raiz com a URL do banco:
+
+```
+DATABASE_URL=postgresql://postgres:docker@localhost:5433/gerenciamento_de_cursos?schema=public
 ```
 
-## Compile and run the project
+Se preferir usar o banco criado pelo `docker-compose.yml` (nome `nest-clean`) altere para:
 
-```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+```
+DATABASE_URL=postgresql://postgres:docker@localhost:5433/nest-clean?schema=public
 ```
 
-## Run tests
+## Instruções rápidas
+
+1. Instale dependências:
 
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+npm install
 ```
 
-## Deployment
-
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+2. Suba o Postgres (opcional, recomendado):
 
 ```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+docker compose up -d
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+3. (Se necessário) crie a database esperada no container:
 
-## Resources
+```bash
+docker compose exec postgres psql -U postgres -c "CREATE DATABASE gerenciamento_de_cursos;"
+```
 
-Check out a few resources that may come in handy when working with NestJS:
+4. Aplique o schema Prisma:
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+```bash
+npx prisma migrate deploy --schema=prisma/schema.prisma
+# ou em dev:
+# npx prisma migrate dev --schema=prisma/schema.prisma
+# alternativa rápida:
+# npx prisma db push --schema=prisma/schema.prisma
+```
 
-## Support
+5. Rode a aplicação:
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+```bash
+npm run dev
+```
 
-## Stay in touch
+A aplicação escuta por padrão na porta `5555` (variável `PORT` em `process.env`).
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+## Endpoints principais
 
-## License
+Base: `http://localhost:5555/api/cursos`
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+- POST /api/cursos
+  - Body:
+    ```json
+    {
+      "name": "string",
+      "description": "string",
+      "duration": 40,
+      "date_init": "2025-01-15"
+    }
+    ```
+
+- GET /api/cursos
+
+- GET /api/cursos?data_init=YYYY-MM-DD&duration=N
+
+- GET /api/cursos/:id
+
+- PATCH /api/cursos/:id
+  - Body parcial: `{ "name": "...", "duration": 50 }`
+
+- DELETE /api/cursos/:id
+
+Exemplos prontos estão no arquivo `api.http`.
+
+## Validação e transformação
+
+- `ValidationPipe({ transform: true })` está ativado em `main.ts`: strings que representam datas são convertidas automaticamente em `Date`.
+- DTO `UserDto` aceita `date_init` como `Date` e `id` é opcional.
+
+## Troubleshooting
+
+- SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string
+  - Verifique se `DATABASE_URL` está acessível em runtime. Garanta `import 'dotenv/config'` ou carregue as variáveis antes de instanciar Prisma.
+
+- FATAL: database "gerenciamento_de_cursos" does not exist
+  - O `docker-compose.yml` define `POSTGRES_DB=nest-clean`. Ou crie a DB (`CREATE DATABASE`) ou ajuste `.env` para `nest-clean`.
+
+- Invalid Date / campos undefined
+  - Verifique nomes dos campos no JSON (`description`, `date_init`) e Content-Type: `application/json`.
+
+- EADDRINUSE: address already in use :::5555
+  - Libere a porta: `lsof -i :5555 -sTCP:LISTEN -Pn` e `kill <PID>`.
+
+## Próximos passos sugeridos
+
+- Adicionar Swagger (decorators para documentação automática)
+- Adicionar testes unitários/e2e
+- Configurar CI para aplicar migrations no deploy
+
+---
+
+Se quiser, eu posso: aplicar Swagger, rodar testes locais ou ajustar o README com instruções mais detalhadas para desenvolvimento/produção.

@@ -1,6 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
 import { UserDto } from "src/dto/user-dto";
+import { FilterDto } from "src/dto/fiter-dto";
 
 @Injectable()
 export class UserService {
@@ -25,6 +26,22 @@ export class UserService {
     return this.prisma.course.findUnique({
       where: { id },
     });
+  }
+
+  findFiltered(filters?:FilterDto){
+    const where: any ={}
+    if (filters?.data_init){
+      where.date_init =  new Date (filters.data_init)
+    }
+    if (filters?.duration){
+      where.duration = filters.duration
+    }
+
+    return this.prisma.course.findMany({
+      where,
+      orderBy: { date_init: 'asc' }
+    })
+
   }
 
   async updateCourse(id: string, data: UserDto) {
